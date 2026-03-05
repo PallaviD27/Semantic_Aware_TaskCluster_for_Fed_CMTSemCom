@@ -1,0 +1,76 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgrey204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgrey204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TEST Accuracy per Round Scenario 2},
+x grid style={darkgrey176},
+xlabel={Communication Rounds},
+xmin=0.55, xmax=10.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Test Accuracy (%)},
+ymin=80.0455, ymax=100.3845,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 82.63
+2 95.63
+3 96.91
+4 97.81
+5 98.69
+6 98.98
+7 99.18
+8 99.19
+9 99.2
+10 99.22
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 80.97
+2 95.1
+3 97.1
+4 97.33
+5 96.94
+6 96.78
+7 96.65
+8 96.67
+9 96.63
+10 96.85
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 98.84
+2 99.24
+3 99.41
+4 99.43
+5 99.43
+6 99.45
+7 99.45
+8 99.46
+9 99.46
+10 99.46
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}

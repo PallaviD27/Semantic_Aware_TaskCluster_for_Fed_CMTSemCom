@@ -1,0 +1,136 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgrey204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgrey204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TEST Accuracy per Epoch - Scenario 3},
+x grid style={darkgrey176},
+xlabel={Epochs},
+xmin=-0.45, xmax=31.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Test Accuracy (%)},
+ymin=17.13, ymax=100.51,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 82.14
+2 81.23
+3 81.22
+4 80.74
+5 80.4
+6 80.59
+7 80.59
+8 80.79
+9 80.46
+10 80.55
+11 80.35
+12 80.23
+13 80.02
+14 80
+15 79.86
+16 79.9
+17 79.99
+18 80.1
+19 80.27
+20 80.31
+21 80.45
+22 80.58
+23 80.78
+24 80.85
+25 80.92
+26 80.98
+27 81.09
+28 81.18
+29 81.26
+30 81.3
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 20.92
+2 21.18
+3 56.95
+4 57.92
+5 57.61
+6 57.77
+7 57.81
+8 57.74
+9 57.84
+10 57.72
+11 57.8
+12 57.86
+13 57.95
+14 58.17
+15 58.19
+16 58.33
+17 58.29
+18 58.36
+19 58.25
+20 58.07
+21 57.96
+22 57.83
+23 57.83
+24 57.74
+25 57.62
+26 57.55
+27 57.49
+28 57.14
+29 57.05
+30 56.9
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 93.2
+2 93.2
+3 94.06
+4 94.34
+5 94.52
+6 94.88
+7 95.51
+8 95.83
+9 96.06
+10 96.22
+11 96.39
+12 96.49
+13 96.59
+14 96.69
+15 96.72
+16 96.7
+17 96.66
+18 96.58
+19 96.55
+20 96.53
+21 96.53
+22 96.52
+23 96.54
+24 96.56
+25 96.58
+26 96.61
+27 96.62
+28 96.61
+29 96.6
+30 96.62
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}

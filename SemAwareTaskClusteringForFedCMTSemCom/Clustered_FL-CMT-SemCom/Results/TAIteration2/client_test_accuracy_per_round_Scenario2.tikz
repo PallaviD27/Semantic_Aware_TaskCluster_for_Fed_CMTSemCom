@@ -1,0 +1,136 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgrey204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgrey204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TEST Accuracy per Round Scenario 2},
+x grid style={darkgrey176},
+xlabel={Communication Rounds},
+xmin=-0.45, xmax=31.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Test Accuracy (%)},
+ymin=16.8405, ymax=100.8695,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 72.66
+2 69.29
+3 77.62
+4 80.49
+5 79.97
+6 80.34
+7 80.96
+8 81.08
+9 81.61
+10 81.73
+11 81.65
+12 81.62
+13 81.59
+14 81.63
+15 81.8
+16 81.97
+17 81.94
+18 82.07
+19 82
+20 81.96
+21 82.13
+22 82.32
+23 82.55
+24 82.67
+25 82.73
+26 82.83
+27 82.94
+28 83.12
+29 83.21
+30 83.27
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 20.66
+2 21.13
+3 21.42
+4 39.56
+5 69.71
+6 72.23
+7 73.34
+8 73.77
+9 74.84
+10 75.44
+11 75.85
+12 76.01
+13 76.13
+14 76.34
+15 76.39
+16 76.47
+17 76.44
+18 76.56
+19 76.7
+20 76.76
+21 76.81
+22 76.82
+23 76.82
+24 76.92
+25 76.89
+26 76.85
+27 76.78
+28 76.73
+29 76.7
+30 76.61
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 94.3
+2 93.74
+3 93.67
+4 94.08
+5 94.44
+6 95.16
+7 95.96
+8 96.12
+9 96.43
+10 96.56
+11 96.8
+12 96.89
+13 96.94
+14 96.98
+15 96.98
+16 96.99
+17 97.01
+18 96.94
+19 96.95
+20 97.01
+21 97.02
+22 97.03
+23 97.05
+24 97.03
+25 97.02
+26 97
+27 96.98
+28 96.97
+29 96.97
+30 96.95
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}

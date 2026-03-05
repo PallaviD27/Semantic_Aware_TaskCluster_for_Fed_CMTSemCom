@@ -1,0 +1,76 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgrey204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgrey204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TEST Loss per Round Scenario 2},
+x grid style={darkgrey176},
+xlabel={Communication Rounds},
+xmin=0.55, xmax=10.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Test Loss},
+ymin=-0.00444064923580329, ymax=0.561110091382575,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 0.535403239536285
+2 0.159485034966469
+3 0.0631762888178229
+4 0.037642675191164
+5 0.0323535648733377
+6 0.0300120774537325
+7 0.0296660861134529
+8 0.0297811296142638
+9 0.029821099036932
+10 0.0298507257472724
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 0.22976787610054
+2 0.0849804907202721
+3 0.0543838647380471
+4 0.0450374568603933
+5 0.0433832462392747
+6 0.0438333119608462
+7 0.0446944855719805
+8 0.0456091742187738
+9 0.0464329781670123
+10 0.0471150758208707
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 0.0314309458691627
+2 0.0212662026104867
+3 0.0219793305381128
+4 0.0233361965163087
+5 0.0245233793953025
+6 0.0254527334506108
+7 0.0262320040611517
+8 0.0269064349088829
+9 0.0274848769934104
+10 0.0280117025651509
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}

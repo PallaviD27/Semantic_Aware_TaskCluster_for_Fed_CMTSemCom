@@ -1,0 +1,136 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgray204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TEST Accuracy per Round Unclustered_FL-CMT-SemCom},
+x grid style={darkgray176},
+xlabel={Communication Rounds},
+xmin=-0.45, xmax=31.45,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Test Accuracy (\%)},
+ymin=13.5395, ymax=94.7305,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 89.68
+2 90.24
+3 85.75
+4 87.5
+5 90.02
+6 87.98
+7 85.12
+8 82.67
+9 81.96
+10 81.88
+11 82.25
+12 82.99
+13 83.72
+14 84.2
+15 84.93
+16 85.71
+17 86.5
+18 87.11
+19 87.62
+20 87.78
+21 88.33
+22 88.53
+23 88.82
+24 89.09
+25 89.4
+26 89.74
+27 90.1
+28 90.42
+29 90.82
+30 91.04
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 18.85
+2 17.23
+3 18.09
+4 19.06
+5 23.86
+6 54.8
+7 68.39
+8 70.57
+9 72.46
+10 73.1
+11 72.9
+12 72.42
+13 72.5
+14 72.43
+15 72.59
+16 73.01
+17 73.13
+18 73.29
+19 73.14
+20 72.93
+21 72.96
+22 72.83
+23 72.94
+24 73.15
+25 73.06
+26 73.07
+27 73.1
+28 73.17
+29 74.1
+30 74.43
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 80.38
+2 76.55
+3 77.87
+4 78.14
+5 75.77
+6 76.57
+7 77.94
+8 78.79
+9 79.21
+10 79.85
+11 80.44
+12 81.39
+13 82.04
+14 82.24
+15 82.47
+16 82.51
+17 82.75
+18 83.01
+19 83.35
+20 83.74
+21 84.36
+22 84.97
+23 85.7
+24 86.46
+25 87.27
+26 87.96
+27 88.86
+28 89.53
+29 89.63
+30 90.02
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}
