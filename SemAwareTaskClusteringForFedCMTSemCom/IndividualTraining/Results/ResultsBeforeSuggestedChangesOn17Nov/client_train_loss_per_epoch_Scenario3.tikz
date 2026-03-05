@@ -1,0 +1,76 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgrey204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgrey204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TRAIN Loss per Epoch - Scenario 3},
+x grid style={darkgrey176},
+xlabel={Epochs},
+xmin=0.55, xmax=10.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Train Loss},
+ymin=-0.00167854565824382, ymax=0.931805277617415,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 0.442112585306168
+2 0.220535726137459
+3 0.129042067863047
+4 0.0881931510474533
+5 0.0759260725881904
+6 0.066365148499608
+7 0.0582160937599838
+8 0.0512811020808294
+9 0.045475280743558
+10 0.0407525372179225
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 0.889374194741249
+2 0.713445850908756
+3 0.697451364547014
+4 0.532734613865614
+5 0.353934415727854
+6 0.255112074762583
+7 0.171570226587355
+8 0.138323506079614
+9 0.119119694177061
+10 0.105229316987097
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 0.422152198553085
+2 0.171083480007946
+3 0.119719511345029
+4 0.0974407490901649
+5 0.0831867202557623
+6 0.0734089045599103
+7 0.0661975208017975
+8 0.0605434047617018
+9 0.0559092460107058
+10 0.0519167626462877
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}

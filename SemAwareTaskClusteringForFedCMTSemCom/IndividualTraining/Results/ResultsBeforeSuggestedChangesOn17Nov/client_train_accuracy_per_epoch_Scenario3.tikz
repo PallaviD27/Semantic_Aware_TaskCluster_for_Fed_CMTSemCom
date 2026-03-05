@@ -1,0 +1,76 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgrey204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgrey204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TRAIN Accuracy per Epoch - Scenario 3},
+x grid style={darkgrey176},
+xlabel={Epochs},
+xmin=0.55, xmax=10.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Train Accuracy (%)},
+ymin=75.7365, ymax=100.1235,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 88.3
+2 88.3
+3 97.11
+4 97.605
+5 97.96
+6 98.19
+7 98.41
+8 98.625
+9 98.81
+10 99.015
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 76.845
+2 76.845
+3 76.845
+4 83.9
+5 95.2
+6 95.97
+7 96.57
+8 96.99
+9 97.38
+10 97.67
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 86.5
+2 86.5
+3 98.26
+4 98.485
+5 98.585
+6 98.645
+7 98.7
+8 98.75
+9 98.82
+10 98.915
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}

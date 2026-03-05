@@ -1,0 +1,35 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+tick align=outside,
+tick pos=left,
+title={Overall TEST Loss vs Epochs - Scenario 3},
+x grid style={darkgrey176},
+xlabel={Epochs},
+xmin=0.55, xmax=10.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Test Loss},
+ymin=0.0468352573174238, ymax=0.400066269042293,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 0.38401031396389
+2 0.317660353358587
+3 0.272739753615856
+4 0.17697824909091
+5 0.140174683694045
+6 0.102602169028421
+7 0.0842141614188751
+8 0.0746462631965677
+9 0.0679950437607865
+10 0.062891212395827
+};
+\end{axis}
+
+\end{tikzpicture}

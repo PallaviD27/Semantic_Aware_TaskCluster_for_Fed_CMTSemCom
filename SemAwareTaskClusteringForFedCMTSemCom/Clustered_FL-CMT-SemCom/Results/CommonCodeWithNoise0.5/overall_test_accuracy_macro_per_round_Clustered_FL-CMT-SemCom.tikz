@@ -1,0 +1,55 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+tick align=outside,
+tick pos=left,
+title={Overall TEST Accuracy vs Communication Rounds Clustered_FL-CMT-SemCom},
+x grid style={darkgray176},
+xlabel={Communication Rounds},
+xmin=-0.45, xmax=31.45,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Test Accuracy (\%)},
+ymin=67.1788333333333, ymax=92.5778333333333,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 68.5466666666667
+2 68.3333333333333
+3 69.5333333333333
+4 87.6166666666667
+5 89.9433333333333
+6 90.8866666666667
+7 91.3033333333333
+8 91.4233333333333
+9 91.02
+10 91.14
+11 90.98
+12 90.95
+13 90.8566666666667
+14 90.72
+15 90.6266666666667
+16 90.4633333333333
+17 90.5033333333333
+18 90.65
+19 90.6866666666667
+20 90.7433333333333
+21 90.72
+22 90.7633333333333
+23 90.78
+24 90.76
+25 90.8033333333333
+26 90.7933333333333
+27 90.7966666666667
+28 90.7833333333333
+29 90.8133333333333
+30 90.81
+};
+\end{axis}
+
+\end{tikzpicture}

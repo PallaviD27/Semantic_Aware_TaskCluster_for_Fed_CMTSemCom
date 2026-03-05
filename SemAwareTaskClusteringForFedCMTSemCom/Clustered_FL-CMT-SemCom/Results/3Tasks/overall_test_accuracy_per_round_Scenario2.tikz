@@ -1,0 +1,55 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+tick align=outside,
+tick pos=left,
+title={Overall TEST Accuracy vs Communication Rounds Scenario 2},
+x grid style={darkgrey176},
+xlabel={Communication Rounds},
+xmin=-0.45, xmax=31.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Test Accuracy (%)},
+ymin=59.266, ymax=94.0406666666667,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 60.8466666666667
+2 64.7166666666667
+3 69.1366666666667
+4 86.52
+5 89.1966666666667
+6 89.72
+7 89.9366666666667
+8 89.7466666666667
+9 89.8433333333333
+10 90.17
+11 91.4
+12 91.18
+13 90.8833333333333
+14 91.1733333333333
+15 91.16
+16 91.3033333333333
+17 91.6566666666667
+18 90.8
+19 91.9166666666667
+20 92.2133333333333
+21 91.7966666666667
+22 91.9666666666667
+23 91.4133333333333
+24 91.6733333333333
+25 92.27
+26 91.91
+27 91.9866666666667
+28 92.37
+29 92.37
+30 92.46
+};
+\end{axis}
+
+\end{tikzpicture}

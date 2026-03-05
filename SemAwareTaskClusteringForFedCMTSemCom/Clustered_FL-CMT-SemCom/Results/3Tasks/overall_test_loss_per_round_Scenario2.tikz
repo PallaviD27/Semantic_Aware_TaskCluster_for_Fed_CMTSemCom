@@ -1,0 +1,35 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+tick align=outside,
+tick pos=left,
+title={Overall TEST Loss vs Communication Rounds Scenario 2},
+x grid style={darkgrey176},
+xlabel={Communication Rounds},
+xmin=0.55, xmax=10.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Test Loss},
+ymin=0.0470871718487212, ymax=0.301878039072804,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 0.290296636017164
+2 0.10336138969399
+3 0.0687754459094838
+4 0.0586685749043614
+5 0.060015533433393
+6 0.0627998138613823
+7 0.0662599572759455
+8 0.0697373285332507
+9 0.0727138442843579
+10 0.0719691711650334
+};
+\end{axis}
+
+\end{tikzpicture}

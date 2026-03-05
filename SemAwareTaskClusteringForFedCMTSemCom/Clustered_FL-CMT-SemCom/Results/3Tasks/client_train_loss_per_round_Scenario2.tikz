@@ -1,0 +1,76 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgrey204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgrey204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TRAIN Loss per Round Scenario 2},
+x grid style={darkgrey176},
+xlabel={Communication Rounds},
+xmin=0.55, xmax=10.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Train Loss},
+ymin=-0.0217903251936371, ymax=0.461259422151947,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 0.102929891285487
+2 0.0416759158133063
+3 0.0233370882231975
+4 0.0139069254504866
+5 0.00723543189441261
+6 0.00429654605964606
+7 0.00269394014146019
+8 0.00181349385000249
+9 0.00127532458852056
+10 0.000983811630717355
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 0.439302615454421
+2 0.109031231088564
+3 0.0644271600758657
+4 0.0431205901885405
+5 0.0310972574634943
+6 0.0237981323418207
+7 0.0192021727997344
+8 0.0164180693831295
+9 0.014739779450465
+10 0.0133797814614372
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 0.0838395689250901
+2 0.0184964404409402
+3 0.00584798456831049
+4 0.00208084316559507
+5 0.000928040983022584
+6 0.00053666114711541
+7 0.000360477987450395
+8 0.000264730498951849
+9 0.000205768771782004
+10 0.000166481503889486
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}

@@ -1,0 +1,76 @@
+% This file was created with tikzplotlib v0.10.1.post13.
+\begin{tikzpicture}
+
+\definecolor{darkgrey176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgrey204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.97,0.03)},
+  anchor=south east,
+  draw=lightgrey204
+},
+tick align=outside,
+tick pos=left,
+title={Client-wise TRAIN Accuracy per Round Scenario 2},
+x grid style={darkgrey176},
+xlabel={Communication Rounds},
+xmin=0.55, xmax=10.45,
+xtick style={color=black},
+y grid style={darkgrey176},
+ylabel={Train Accuracy (%)},
+ymin=96.4615, ymax=100.1685,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 99.08
+2 99.605
+3 99.855
+4 99.95
+5 99.975
+6 100
+7 100
+8 100
+9 100
+10 100
+};
+\addlegendentry{Client 0}
+\addplot [semithick, darkorange25512714]
+table {%
+1 96.63
+2 98.525
+3 99.345
+4 99.675
+5 99.79
+6 99.82
+7 99.83
+8 99.85
+9 99.855
+10 99.87
+};
+\addlegendentry{Client 1}
+\addplot [semithick, forestgreen4416044]
+table {%
+1 99.265
+2 99.795
+3 99.96
+4 100
+5 100
+6 100
+7 100
+8 100
+9 100
+10 100
+};
+\addlegendentry{Client 2}
+\end{axis}
+
+\end{tikzpicture}
