@@ -8,6 +8,7 @@ from torchvision import datasets, transforms # Loads standard datasets like MNIS
 
 from sampling import custom_skewed_partition
 import numpy as np
+from collections import Counter
 
 def get_dataset(args):
     '''
@@ -105,6 +106,32 @@ def get_dataset(args):
         raise ValueError('Invalid dataset')
 
     return train_dataset, test_dataset, user_groups, test_user_groups, label_mappings
+
+def print_mapped_label_distribution(dict_users, dataset, label_mappings, title ="Mapped label distribution"):
+    '''
+    Print mapped task-label counts for each client subset.
+    :param dict_users:
+    :param dataset:
+    :param label_mappings:
+    :param title:
+    :return:
+    '''
+    print(f"\n ======={title}=======")
+    for client_id, indices in dict_users.items():
+        raw_labels = dataset.targets[indices].numpy().tolist()
+
+        if label_mappings and client_id in label_mappings:
+            map_fn = label_mappings[client_id]
+            mapped_labels = [map_fn(int(y)) for y in raw_labels]
+        else:
+            mapped_labels = raw_labels
+
+        counts = Counter(mapped_labels)
+        total = len(mapped_labels)
+
+        print(f"\nClient {client_id} mapped labels (total={total}):")
+        for cls in sorted(counts.keys()):
+            print(f" class{cls}: {counts[cls]}")
 
 # The function below is FedAvg equivalent
 def average_weights(w):

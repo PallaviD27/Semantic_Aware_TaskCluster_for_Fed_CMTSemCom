@@ -21,7 +21,7 @@ from utils import get_dataset, average_weights, exp_details
 from model import SharedEncoder, TaskHead
 from update import test_inference_multitask
 from collections import defaultdict
-from channel import awgn_channel
+from channel import awgn_agg_normalize, awgn_agg_no_normalize, rms_power_normalize_weight
 import os
 print("Python:", sys.version)
 print("Torch version:", torch.__version__)
@@ -89,8 +89,15 @@ if __name__ == '__main__':
 
     try:
 
-        from sampling import print_label_distribution
-        print_label_distribution(user_groups, train_dataset)
+        from sampling import print_raw_label_distribution
+        from utils import print_mapped_label_distribution
+
+        print_raw_label_distribution(user_groups, train_dataset, title="TRAIN raw label distribution")
+        print_mapped_label_distribution(user_groups, train_dataset, label_mappings,
+                                        title="TRAIN mapped task-label distribution")
+        print_raw_label_distribution(test_user_groups, test_dataset, title="TEST raw-label distribution")
+        print_mapped_label_distribution(test_user_groups, test_dataset, label_mappings,
+                                        title="TEST mapped task-label distribution")
 
         # Build model
         # If convolutional neural network
@@ -120,7 +127,10 @@ if __name__ == '__main__':
 
                 # Client-specific heads
                 client_heads = {
-                    cid: TaskHead(input_dim=8, output_dim=out_dim).to(device)
+                    cid: TaskHead(input_dim=8, output_dim=out_dim).to(device) # This is baseline
+                    # cid: TaskHead(input_dim=16, output_dim=out_dim).to(device) # IT2
+                    # cid: TaskHead(input_dim=8, output_dim=out_dim).to(device) # IT3
+                    # cid: TaskHead(input_dim=16, output_dim=out_dim).to(device) # IT4
                     for cid, out_dim in client_output_dims.items()
                 }
 
@@ -225,6 +235,17 @@ if __name__ == '__main__':
                 # Step 2 FL - Local weights per-client found/updated
                 w, loss = local_model.update_weights(global_round=epoch)
 
+                #  Normalization code still to be corrected
+
+                if args.weight_normalize:
+                    w = rms_power_normalize_weight(w)
+                    w = awgn_agg_normalize(w, sigma_agg=args.sigma_agg, snr_db_agg=args.snr_db_agg)
+
+                else:
+                    if args.downlink:
+                        w = awgn_agg_no_normalize(w, sigma_agg=args.sigma_agg, snr_db_agg=args.snr_db_agg)
+
+
                 client_train_loss[idx][-1] = float(loss)
 
                 acc_train_frac, _ = local_model.inference()  # accuracy on this client's TRAIN data
@@ -240,6 +261,7 @@ if __name__ == '__main__':
                 # Step 3 FL - local weights of individual clients averaged
                 encoder_weights = average_weights(local_weights)
                 # Step 4 FL - Shared encoder updated with encoder (averaged) weights
+                #  Still to be decided where uplink noise is to be added
                 shared_encoder.load_state_dict(encoder_weights)
             else:
                 global_weights = average_weights(local_weights)

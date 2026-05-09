@@ -5,28 +5,12 @@ from torch import nn  # nn is for neural neural network modules like loss functi
 # Import Dataloader and Dataset to handle the data batching and custom dataset structures.
 from torch.utils.data import DataLoader, Dataset
 import torch.optim as optim
-from channel import awgn_channel
-class DatasetSplit(Dataset):
-    '''
-    This class wraps around a Dataset and restricts it to only the subset of indices idxs.
-    '''
-    def __init__(self, dataset, idxs):
-        self.dataset = dataset
-        # Store the list of indexes that a particular user/client will use.
-        self.idxs = [int(i) for i in idxs]
+from channel import awgn_channel_normalize, awgn_channel_no_normalize
 
-    def __len__(self):
-        '''
-        This function returns the number of samples in a dataset, based on the number of assigned indexes.
-        '''
-
-        return len(self.idxs)
-
-    def __getitem__(self, item):
-        image, label = self.dataset[self.idxs[item]]
-        if not isinstance(label, torch.Tensor):
-            label = torch.tensor(label)
-        return image.clone().detach(), label.clone().detach()
+from torch.utils.data import DataLoader, Subset
+import torch.nn as nn
+from channel import rms_power_normalize_signal
+# Removed DatasetSplit class
 
 # Local training on each client; each client train privately
 class LocalUpdate(object):
@@ -67,26 +51,7 @@ class LocalUpdate(object):
             self.criterion = nn.CrossEntropyLoss().to(self.device)  # or CrossEntropyLoss() if output isn't log_softmax
             self.optimizer = None # Optimizer not being built here but where it is needed i.e. update_weights
 
-    def train_val_test(self, dataset,idxs ):
-        '''
-        Returns train, validation and test dataloaders for a given dataset
-        and user indexes.
-        '''
-
-        # Split indexes for train, validation and test (80,10,10)
-        idxs_train = idxs[:int(0.8*len(idxs))]
-        idxs_val = idxs[int(0.8*len(idxs)):int(0.9*len(idxs))]
-        idxs_test = idxs[int(0.9*len(idxs)):]
-
-        trainloader = DataLoader(DatasetSplit(dataset,idxs_train),
-                                 batch_size=self.args.local_bs, shuffle = True)
-
-        validloader = DataLoader(DatasetSplit(dataset,idxs_val), batch_size=int(len(idxs_val)/10), shuffle=False)
-
-        testloader = DataLoader(DatasetSplit(dataset, idxs_test), batch_size=int(len(idxs_test)/10), shuffle=False)
-
-        return trainloader, validloader, testloader
-
+    # Removed def train_val_test
 
     def update_weights(self, global_round):
         self.encoder.to(self.device)
@@ -143,7 +108,16 @@ class LocalUpdate(object):
                 # Without AWGN
                 # outputs = self.head(self.encoder(images))
                 x = self.encoder(images)
-                x_hat = awgn_channel(x, sigma=self.args.sigma)
+                power_before = x.pow(2).mean(dim=1).mean().item()
+                print(power_before)
+                if self.args.signal_normalize:
+                    x = rms_power_normalize_signal(x)  # Normalization of latent vector to unit power
+                    power_after = x.pow(2).mean(dim=1).mean().item()
+                    print(power_after)
+                    x_hat = awgn_channel_normalize(x, sigma_signal=self.args.sigma_signal,
+                                                   snr_db_signal=self.args.snr_db_signal)
+
+                x_hat = awgn_channel_no_normalize(x, sigma_signal=self.args.sigma_signal,snr_db_signal=self.args.snr_db_signal)
                 if batch_idx == 0 and epoch == 0:
                     print(
                         f"[Client {self.client_id}] x std={x.std().item():.4f} | noise std={(x_hat - x).std().item():.4f}")
@@ -222,7 +196,15 @@ class LocalUpdate(object):
                 # outputs = self.model(images)
                 # With AWGN noise
                 x = self.encoder(images)
-                x_hat = awgn_channel(x, sigma=self.args.sigma)
+                power_before = x.pow(2).mean(dim=1).mean().item()
+                print(power_before)
+                if self.args.signal_normalize:
+                    x = rms_power_normalize_signal(x)  # Normalization of latent vector to unit power
+                    power_after = x.pow(2).mean(dim=1).mean().item()
+                    print(power_after)
+                    x_hat = awgn_channel_normalize(x,sigma_signal=self.args.sigma_signal,snr_db_signal=self.args.snr_db_signal)
+
+                x_hat = awgn_channel_no_normalize(x, sigma_signal=self.args.sigma_signal,snr_db_signal=self.args.snr_db_signal)
                 outputs = self.head(x_hat)
 
                 batch_loss = self.criterion(outputs, labels)  # mean over batch
@@ -278,7 +260,16 @@ def test_inference(args, model, test_dataset, label_mapping=None):
                 labels = torch.tensor(mapped, dtype=torch.long, device=device)
 
             x = model.encoder(images)
-            x_hat = awgn_channel(x, sigma=args.sigma)
+            power_before = x.pow(2).mean(dim=1).mean().item()
+            print(power_before)
+            if args.signal_normalize:
+                x = rms_power_normalize_signal(x)  # Normalization of latent vector to unit power
+                power_after = x.pow(2).mean(dim=1).mean().item()
+                print(power_after)
+                x_hat = awgn_channel_normalize(x, sigma_signal=args.sigma_signal,
+                                                  snr_db_signal=args.snr_db_signal)
+
+            x_hat = awgn_channel_no_normalize(x, sigma_signal=args.sigma_signal,snr_db_signal=args.snr_db_signal)
             outputs = model.head(x_hat)
             # outputs = model(images)
 
@@ -299,159 +290,7 @@ def test_inference(args, model, test_dataset, label_mapping=None):
     accuracy = 100.0 * correct / total_samples
     return accuracy, avg_loss
 
-# def test_inference(args, model, test_dataset):
-#     '''
-#     Returns the accuracy and the loss
-#     :param model:
-#     :param test_dataset:
-#     :return: accuracy, loss
-#     '''
-#
-#     model.eval()
-#     loss, total, correct = 0.0, 0.0, 0.0
-#
-#     device = 'cuda' if args.gpu else 'cpu'
-#     if args.model=='CNN':
-#         criterion = nn.CrossEntropyLoss().to(device)
-#
-#     elif args.model=='AutoEncoder':
-#         # MSE loss for auto-encoder; one of the criterion is to be commented out
-#         criterion = nn.CrossEntropyLoss().to(device)
-#
-#     testloader = DataLoader(test_dataset, batch_size=128, shuffle=False)
-#
-#     for batch_idx, (images, labels) in enumerate(testloader):
-#         images, labels = images.to(device), labels.to(device)
-#
-#         # Inference
-#         outputs = model(images)
-#
-#         if args.model == 'AutoEncoder':
-#             batch_loss = criterion(outputs, images)
-#             loss += batch_loss.item()
-#             total += images.size(0)
-#         else:
-#             batch_loss = criterion(outputs, labels)
-#             loss += batch_loss.item()
-#
-#             # Prediction
-#             _, pred_labels = torch.max(outputs,1)
-#             pred_labels = pred_labels.view(-1)
-#             correct += torch.sum(torch.eq(pred_labels, labels)).item()
-#             total += len(labels)
-#
-#     if args.model == 'AutoEncoder':
-#         return None, loss/total # For autoencoder only loss is returned, accuracy can be None or 0
-#
-#     else:
-#         accuracy = correct/total
-#         return accuracy, loss / total
 
-from torch.utils.data import DataLoader, Subset
-import torch.nn as nn
 
-# def test_inference_multitask(
-#     args, encoder, heads, test_dataset, user_groups,
-#     client_test_accuracies=None, client_test_losses=None,
-#     label_mappings=None
-# ):
-#     """
-#     Returns:
-#         avg_acc (overall %), avg_loss (overall per-sample),
-#         client_test_accuracies: dict[int, list[float]]  # % per client per round
-#         client_test_losses:     dict[int, list[float]]  # per-sample loss per client per round
-#     """
-#     # device = 'cuda' if (torch.cuda.is_available() and args.gpu) else 'cpu'
-#     device = 'cuda' if torch.cuda.is_available() and (not args.cpu) else 'cpu'
-#     if device == 'cuda':
-#         torch.cuda.set_device(args.gpu)
-#
-#     # init dicts if needed
-#     if client_test_accuracies is None:
-#         client_test_accuracies = {}
-#     if client_test_losses is None:
-#         client_test_losses = {}
-#
-#     # convenience: last Linear out_features of a head
-#     def head_out_dim(h):
-#         if hasattr(h, "fc"):
-#             return h.fc[-1].out_features
-#         elif isinstance(h, torch.nn.Sequential):
-#             return list(h.children())[-1].out_features
-#         else:
-#             last_linear = [m for m in h.modules() if isinstance(m, torch.nn.Linear)][-1]
-#             return last_linear.out_features
-#
-#     total_correct, total_samples = 0, 0
-#     total_loss_sum = 0.0
-#
-#     # ensure encoder is on correct device (heads are moved when wrapped into model)
-#     encoder = encoder.to(device)
-#
-#     for client_id in range(args.num_users):
-#         head = heads[client_id]
-#         model = nn.Sequential(encoder, head).to(device)
-#         model.eval()
-#
-#         test_loader = DataLoader(
-#             Subset(test_dataset, list(user_groups[client_id])),
-#             batch_size=64, shuffle=False
-#         )
-#         criterion = nn.CrossEntropyLoss().to(device)
-#
-#         correct, samples = 0, 0
-#         loss_sum = 0.0  # accumulate **per-sample** loss
-#         out_dim = head_out_dim(head)
-#
-#         with torch.no_grad():
-#             for images, labels in test_loader:
-#                 images = images.to(device)
-#                 labels = labels.to(device).long()   # CE needs Long target
-#
-#                 # client-specific label remap (if provided)
-#                 if label_mappings and client_id in label_mappings:
-#                     map_fn = label_mappings[client_id]
-#                     mapped = [map_fn(int(y.item())) for y in labels]
-#                     labels = torch.tensor(mapped, dtype=torch.long, device=device)
-#
-#                 # bound check once (avoids IndexError in CE)
-#                 if labels.numel() > 0 and (labels.min() < 0 or labels.max() >= out_dim):
-#                     raise ValueError(
-#                         f"[Client {client_id}] Mapped label(s) out of range for head with {out_dim} outputs. "
-#                         f"min={labels.min().item()}, max={labels.max().item()}"
-#                     )
-#
-#                 # outputs = model(images)
-#                 # With noise
-#                 x = encoder(images)
-#                 x_hat = awgn_channel(x, sigma=args.sigma)
-#                 outputs = head(x_hat)
-#
-#                 # loss returned is mean over the batch -> convert to sum then to per-sample
-#                 bs = labels.size(0)
-#                 batch_loss = criterion(outputs, labels)   # mean over batch
-#                 loss_sum   += batch_loss.item() * bs
-#                 samples    += bs
-#
-#                 _, predicted = torch.max(outputs, 1)
-#                 correct    += (predicted == labels).sum().item()
-#
-#         # per-client stats for this round
-#         acc_client = 100.0 * correct / samples if samples > 0 else 0.0
-#         loss_client = loss_sum / samples if samples > 0 else 0.0
-#
-#         # stash into dicts
-#         if client_id not in client_test_accuracies:
-#             client_test_accuracies[client_id] = []
-#             client_test_losses[client_id]     = []
-#         client_test_accuracies[client_id].append(acc_client)
-#         client_test_losses[client_id].append(loss_client)
-#
-#         # accumulate overall
-#         total_correct  += correct
-#         total_loss_sum += loss_sum
-#         total_samples  += samples
-#
-#     avg_acc  = 100.0 * total_correct / total_samples if total_samples > 0 else 0.0
-#     avg_loss = total_loss_sum / total_samples if total_samples > 0 else 0.0
-#     return avg_acc, avg_loss, client_test_accuracies, client_test_losses
+
+

@@ -6,6 +6,7 @@ import torch
 import torchvision
 from torchvision import datasets, transforms
 import options
+from collections import Counter
 
 def custom_skewed_partition(dataset, num_users, seed=None):
 
@@ -118,14 +119,16 @@ def custom_skewed_partition(dataset, num_users, seed=None):
 from collections import Counter
 
 
-def print_label_distribution(dict_users, dataset):
-    for client_id, indices in dict_users.items():
-        labels = dataset.targets[indices]
-        counts = Counter(labels.numpy())
-        total = len(indices)
-        print(f"\n Client {client_id} label distribution (Total:{total}):")
-        for d in range(10):
-            print(f" {d}: {counts.get(d, 0)}")
+def print_raw_label_distribution(dict_users,dataset, title="Raw label distribution"):
+ print(f"\n======= {title} =======")
+ for client_id, indices in dict_users.items():
+  labels = dataset.targets[indices]
+  counts = Counter(labels.numpy())
+  total = len(indices)
+
+  print(f"\n Client {client_id} raw labels (Total:{total}):")
+  for d in range(10):
+   print(f" digit {d}: {counts.get(d, 0)}")
 
 
 
@@ -189,6 +192,32 @@ def get_dataset(args):
         print('Invalid dataset selection')
 
     return train_dataset, test_dataset, user_groups, test_user_groups, label_mappings
+
+def print_mapped_label_distribution(dict_users, dataset, label_mappings, title ="Mapped label distribution"):
+    '''
+    Print mapped task-label counts for each client subset.
+    :param dict_users:
+    :param dataset:
+    :param label_mappings:
+    :param title:
+    :return:
+    '''
+    print(f"\n ======={title}=======")
+    for client_id, indices in dict_users.items():
+        raw_labels = dataset.targets[indices].numpy().tolist()
+
+        if label_mappings and client_id in label_mappings:
+            map_fn = label_mappings[client_id]
+            mapped_labels = [map_fn(int(y)) for y in raw_labels]
+        else:
+            mapped_labels = raw_labels
+
+        counts = Counter(mapped_labels)
+        total = len(mapped_labels)
+
+        print(f"\nClient {client_id} mapped labels (total={total}):")
+        for cls in sorted(counts.keys()):
+            print(f" class{cls}: {counts[cls]}")
 
 
 def exp_details(args):

@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: tikzplot
+Version: 0.0.2
+Summary: A python package for simple tikz based plots.
+Home-page: https://github.com/Hoeppke/tikzplot
+Author: Christoph Hoeppke
+Author-email: christoph.hoeppke@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+# tikzplot
+Python package for simple latex / tikz based plots
+
+

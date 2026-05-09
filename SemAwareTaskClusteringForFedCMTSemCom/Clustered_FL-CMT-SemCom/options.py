@@ -70,8 +70,39 @@ def args_parser():
     #                     help='Random Seed')
 
     # Argument for input noise
-    parser.add_argument('--sigma', type=float, default=0.0,
-                        help='Standard deviation for AWGN noise; 0 disables the noise')
+    # parser.add_argument('--sigma', type=float, default=0.0,
+    #                     help='Standard deviation for AWGN noise; 0 disables the noise')
+
+    # Arguments for no normalization
+    parser.add_argument('--snr_db_signal', type=float, default=None,
+                        help='Signal to Noise ratio desired in an AWGN in the channel between the decoder \n'
+                             'and encoder during training; None implies no noise.\n'
+                             'sigma_signal can be used instead of this')
+
+    parser.add_argument('--sigma_signal', type=float, default=None,
+                        help='Noise standard deviation of the AWGN in the channel between the encoder and decoder')
+
+    parser.add_argument('--signal_normalize', action='store_true',
+                        help= 'Controls whether normalization is applied to encoder outputs or not; \n'
+                              'Passing the flag applies normalization and not passing it does not')
+
+
+    parser.add_argument('--downlink', action='store_true', help='Controls if noise is to be\n'
+                        ' applied in the channel from clients to Global Server')
+    parser.add_argument('--uplink', action='store_true', help='Controls if noise is to be applied\n'
+                        'in the channel from Global Server to clients')
+
+    parser.add_argument('--sigma_agg', type=float, default=None,
+                        help='Noise standard deviation of the AWGN channel between between clients and GS')
+
+    parser.add_argument('--weight_normalize', action='store_true', help='Controls whether normalization is \n'
+                        'applied to weights or not. Passing the flag applies normalization and not passing it does not')
+
+    parser.add_argument('--snr_db_agg', type=float, default= None,
+                        help = 'Signal to Noise ratio desired in an AWGN in the channel between clients and GS \n'
+                               'This is to be used when aggregating model parameters.\n'
+                               'None implies no noise')
+
 
     args = parser.parse_args()
 

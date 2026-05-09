@@ -65,8 +65,19 @@ def args_parser():
                         help='Verbose')
 
     # Argument for input noise
-    parser.add_argument('--sigma', type=float, default=0.0,
-                        help='Standard deviation for AWGN noise; 0 disables the noise')
+    # parser.add_argument('--sigma', type=float, default=0.0,
+    #                     help='Standard deviation for AWGN noise; 0 disables the noise')
+    parser.add_argument('--snr_db_signal', type=float, default=None,
+                        help='Signal to Noise ratio desired in an AWGN in the channel between the decoder \n'
+                             'and encoder during training; None implies no noise.\n'
+                             'sigma_signal can be used instead of this')
+
+    parser.add_argument('--sigma_signal', type=float, default=None,
+                        help='Noise standard deviation of the AWGN in the channel between the encoder and decoder')
+
+    parser.add_argument('--signal_normalize', action='store_true',
+                        help='Controls whether normalization is applied to encoder outputs or not; \n'
+                             'Passing the flag applies normalization and not passing it does not')
 
     args = parser.parse_args()
 

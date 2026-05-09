@@ -64,7 +64,10 @@ class SharedEncoder(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(28*28, 32), # Input 28*28 and hidden 128
             nn.ReLU(),
-            nn.Linear(32, 8),
+            nn.Linear(32, 8), # This is the baseline
+            # nn.Linear(32, 16), # IT2
+            # nn.Linear(64, 8), # IT3
+            # nn.Linear(64, 16), # IT4
             nn.ReLU()
 
         )
@@ -97,7 +100,7 @@ class ClientModel(nn.Module):
     def __init__(self, shared_encoder, output_dim):
         super(ClientModel, self).__init__()
         self.encoder = shared_encoder
-        self.head = TaskHead(input_dim=8, output_dim=output_dim)  # 320 is output size from encoder
+        self.head = TaskHead(input_dim=8, output_dim=output_dim)  # This is baseline
 
     def forward(self, x):
         z = self.encoder(x)

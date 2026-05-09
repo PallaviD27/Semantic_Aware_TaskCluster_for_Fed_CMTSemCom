@@ -86,8 +86,14 @@ if __name__ == '__main__':
     logger = SummaryWriter('./logs')
 
     try:
-        from sampling import print_label_distribution
-        print_label_distribution(user_groups, train_dataset)
+        from sampling import print_raw_label_distribution, print_mapped_label_distribution
+
+        print_raw_label_distribution(user_groups, train_dataset, title="TRAIN raw label distribution")
+        print_mapped_label_distribution(user_groups, train_dataset, label_mappings,
+                                        title="TRAIN mapped task-label distribution")
+        print_raw_label_distribution(test_user_groups, test_dataset, title="TEST raw-label distribution")
+        print_mapped_label_distribution(test_user_groups, test_dataset, label_mappings,
+                                        title="TEST mapped task-label distribution")
 
         # ------------------------
         # Build models (per setup)

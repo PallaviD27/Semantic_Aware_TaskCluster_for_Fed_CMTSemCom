@@ -7,7 +7,10 @@ class Encoder_model(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(28*28, 32),
             nn.ReLU(),
-            nn.Linear(32, 8),
+            nn.Linear(32, 8), # This is baseline
+            # nn.Linear(32,16), # IT2
+            # nn.Linear(64, 8), # IT3
+            # nn.Linear(64, 16), # IT4
             nn.ReLU()
         )
         self.has_printed_shape = False
@@ -40,7 +43,11 @@ class ClientModel(nn.Module):
     def __init__(self, encoder, output_dim):
         super(ClientModel, self).__init__()
         self.encoder = encoder
-        self.head = TaskHead(input_dim=8, output_dim=output_dim)  # 8 is output size from encoder
+        self.head = TaskHead(input_dim=8, output_dim=output_dim)  # This is baseline
+        # self.head = TaskHead(16, output_dim=output_dim) # IT2
+        # self.head = TaskHead(8, output_dim=output_dim) # IT3
+        # self.head = TaskHead(16, output_dim=output_dim) # IT4
+
 
     def forward(self, x):
         z = self.encoder(x)

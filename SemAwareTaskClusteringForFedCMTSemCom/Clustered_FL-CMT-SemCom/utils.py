@@ -8,6 +8,7 @@ from torchvision import datasets, transforms # Loads standard datasets like MNIS
 
 from sampling import custom_skewed_partition
 import numpy as np
+from collections import Counter
 
 def get_dataset(args):
     '''
@@ -33,13 +34,6 @@ def get_dataset(args):
 
         # Define task-specific label mapping only if MLP is selected
         label_mappings = {}
-
-        # if args.model == 'MLP':
-        #     label_mappings = {
-        #         0: lambda y: 0 if y == 2 else 1,  # Client 0: [2, not-2]
-        #         1: lambda y: 0 if y == 1 else 1 if y == 2 else 2 if y == 3 else 3,  # Client 1: [1, 2, 3, none]
-        #         2: lambda y: 0 if y == 6 else 1  # Client 2: [6, not-6]
-        #     }
 
         if args.model == 'MLP':
             def map_client_0(y):  # 2 vs not-2
@@ -67,7 +61,7 @@ def get_dataset(args):
             # 🔍 Debug: check that all labels map correctly for each client
             for client_id, map_func in label_mappings.items():
                 for y in range(10):
-                    print(f"Client {client_id}, Label {y} -> Mapped: {map_func(y)}")
+                    print(f"Client {client_id}, raw label {y} -> Mapped: {map_func(y)}")
 
         # Mode of data sampling amongst users. This part controls
         # the data heterogeneity
@@ -105,6 +99,33 @@ def get_dataset(args):
         raise ValueError('Invalid dataset')
 
     return train_dataset, test_dataset, user_groups, test_user_groups, label_mappings
+
+def print_mapped_label_distribution(dict_users, dataset, label_mappings, title ="Mapped label distribution"):
+    '''
+    Print mapped task-label counts for each client subset.
+    :param dict_users:
+    :param dataset:
+    :param label_mappings:
+    :param title:
+    :return:
+    '''
+    print(f"\n ======={title}=======")
+    for client_id, indices in dict_users.items():
+        raw_labels = dataset.targets[indices].numpy().tolist()
+
+        if label_mappings and client_id in label_mappings:
+            map_fn = label_mappings[client_id]
+            mapped_labels = [map_fn(int(y)) for y in raw_labels]
+        else:
+            mapped_labels = raw_labels
+
+        counts = Counter(mapped_labels)
+        total = len(mapped_labels)
+
+        print(f"\nClient {client_id} mapped labels (total={total}):")
+        for cls in sorted(counts.keys()):
+            print(f" class{cls}: {counts[cls]}")
+
 
 # The function below is FedAvg equivalent
 def average_weights(w):

@@ -1,0 +1,55 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+tick align=outside,
+tick pos=left,
+title={Overall TEST Accuracy vs Epochs - IndividualTraining},
+x grid style={darkgray176},
+xlabel={Epochs},
+xmin=-0.45, xmax=31.45,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Test Accuracy (\%)},
+ymin=60.8363333333334, ymax=88.7103333333333,
+ytick style={color=black}
+]
+\addplot [semithick, steelblue31119180]
+table {%
+1 67.4566666666667
+2 63.5066666666667
+3 83.76
+4 85.9966666666667
+5 85.9433333333333
+6 86.8266666666667
+7 87.15
+8 85.1566666666667
+9 85.97
+10 77.2766666666667
+11 84.6533333333334
+12 85.65
+13 62.1033333333333
+14 85.1633333333333
+15 85.1433333333333
+16 85.7433333333333
+17 85.6766666666667
+18 85.5433333333333
+19 85.67
+20 85.5
+21 85.9666666666667
+22 85.9033333333334
+23 87.4433333333333
+24 86.18
+25 85.1433333333333
+26 84.9666666666667
+27 84.65
+28 84.4833333333333
+29 84.8433333333333
+30 84.3766666666667
+};
+\end{axis}
+
+\end{tikzpicture}

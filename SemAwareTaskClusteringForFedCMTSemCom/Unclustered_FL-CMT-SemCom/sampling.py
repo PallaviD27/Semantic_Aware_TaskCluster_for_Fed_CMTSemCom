@@ -121,108 +121,13 @@ def custom_skewed_partition(dataset, num_users, seed=None):
 
 from collections import Counter
 
-def print_label_distribution(dict_users,dataset):
+def print_raw_label_distribution(dict_users,dataset, title="Raw label distribution"):
+ print(f"\n======= {title} =======")
  for client_id, indices in dict_users.items():
   labels = dataset.targets[indices]
   counts = Counter(labels.numpy())
   total = len(indices)
-  print(f"\n Client {client_id} label distribution (Total:{total}):")
+
+  print(f"\n Client {client_id} raw labels (Total:{total}):")
   for d in range(10):
-   print(f" {d}: {counts.get(d, 0)}")
-
-
-
-
-# Second type of skewed dataset
-# def custom_skewed_partition1(dataset, num_users, seed=None):
-#  """
-#  Custom non-IID and equal partition for clients:
-#   - Client 0: 20% of digit 2, 80% from others (excluding 2)
-#   - Client 1: 15% each of digits 1, 2, 3, and 55% from others (excluding 1,2,3)
-#   - Client 2: 20% of digit 6, 80% from others (excluding 6)
-#  Ensures: no overlap across clients; exact samples_per_client per client.
-#  """
-#  import numpy as np
-#  rng = np.random.default_rng(seed)
-#  targets = dataset.targets.numpy()
-#  total_samples = len(targets)
-#  samples_per_client = total_samples // num_users  # 60000 // 3 = 20000
-#
-#  # Pool of available indices per digit (mutable)
-#  available_by_digit = {d: np.where(targets == d)[0].tolist() for d in range(10)}
-#  for d in available_by_digit:
-#   rng.shuffle(available_by_digit[d])
-#
-#  # Bias config per client
-#  bias_config = {
-#   0: {"include": {2: 0.10}, "exclude": [2]},
-#   1: {"include": {1: 0.15, 2: 0.12, 3: 0.15}, "exclude": [1, 2, 3]},
-#   2: {"include": {6: 0.20}, "exclude": [6]},
-#  }
-#
-#  def take_from_digit(digit, k):
-#   """Pop k indices from this digit’s pool."""
-#   k = min(k, len(available_by_digit[digit]))
-#   taken = available_by_digit[digit][:k]
-#   del available_by_digit[digit][:k]
-#   return taken
-#
-#  dict_users = {}
-#
-#  for client_id in range(num_users):
-#   config = bias_config[client_id]
-#   include = config["include"]
-#   exclude = set(config["exclude"])
-#
-#   client_indices = []
-#
-#   # 1) Add biased samples
-#   for digit, ratio in include.items():
-#    need = int(round(ratio * samples_per_client))
-#    client_indices.extend(take_from_digit(digit, need))
-#
-#   # 2) Fill the remainder from "others" digits (excluding `exclude`)
-#   remaining_needed = samples_per_client - len(client_indices)
-#   if remaining_needed > 0:
-#    # Build a unified pool of (digit, count_available) for allowed digits
-#    allowed_digits = [d for d in range(10) if d not in exclude]
-#    # Keep drawing until we hit the target or pools are empty
-#    while remaining_needed > 0 and any(len(available_by_digit[d]) > 0 for d in allowed_digits):
-#     # Pick a digit with available samples
-#     d_choices = [d for d in allowed_digits if len(available_by_digit[d]) > 0]
-#     d = rng.choice(d_choices)
-#     take = min(remaining_needed, len(available_by_digit[d]), 512)  # draw in chunks for speed
-#     client_indices.extend(take_from_digit(d, take))
-#     remaining_needed -= take
-#
-#   # Final safety check: if we couldn’t fill (ran out of data), trim to exact length
-#   client_indices = client_indices[:samples_per_client]
-#   dict_users[client_id] = np.array(client_indices, dtype=np.int64)
-#
-#  # Optional sanity checks
-#  # - no overlap across clients
-#  all_ids = np.concatenate([dict_users[i] for i in range(num_users)])
-#  assert len(all_ids) == len(set(all_ids.tolist())), "Overlap found between client splits!"
-#  # - exactly equal sizes
-#  for i in range(num_users):
-#   assert len(dict_users[i]) == samples_per_client, f"Client {i} size mismatch."
-#
-#  return dict_users
-#
-#
-# from collections import Counter
-# import numpy as np
-#
-# def print_label_distribution(dict_users, dataset):
-#     for client_id, indices in dict_users.items():
-#         labels = dataset.targets[indices]
-#         label_counts = Counter(labels.numpy())
-#         total_samples = len(indices)
-#         print(f"\nClient {client_id} label distribution (Total:{total_samples} samples):")
-#         for label in sorted(label_counts):
-#             print(f"  Label {label}: {label_counts[label]} samples")
-#
-#
-# # mnist_train = datasets.MNIST('./data', train= True, download=True, transform=transforms.ToTensor())
-# # dict_users = custom_skewed_partition(mnist_train, num_users=3)
-# # print_label_distribution(dict_users, mnist_train)
+   print(f" digit {d}: {counts.get(d, 0)}")

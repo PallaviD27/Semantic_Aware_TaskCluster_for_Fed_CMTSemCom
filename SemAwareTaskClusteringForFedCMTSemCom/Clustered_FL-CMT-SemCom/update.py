@@ -4,43 +4,17 @@ import torch
 from torch import nn  # nn is for neural neural network modules like loss functions and layers.
 # Import Dataloader and Dataset to handle the data batching and custom dataset structures.
 from torch.utils.data import DataLoader, Dataset
-import torch.optim as optim
-import channel
-from channel import awgn_channel
-
-class DatasetSplit(Dataset):
-    '''
-    This class wraps around a Dataset and restricts it to only the subset of indices idxs.
-    '''
-    def __init__(self, dataset, idxs):
-        self.dataset = dataset
-        # Store the list of indexes that a particular user/client will use.
-        self.idxs = [int(i) for i in idxs]
-
-    def __len__(self):
-        '''
-        This function returns the number of samples in a dataset, based on the number of assigned indexes.
-        '''
-
-        return len(self.idxs)
-
-    def __getitem__(self, item):
-        image, label = self.dataset[self.idxs[item]]
-        if not isinstance(label, torch.Tensor):
-            label = torch.tensor(label)
-        return image.clone().detach(), label.clone().detach()
+from channel import awgn_channel_normalize, awgn_channel_no_normalize
+from channel import rms_power_normalize_signal
+# Removed DatasetSplit class
+from channel import awgn_agg_normalize, awgn_agg_no_normalize
+from channel import rms_power_normalize_weight
 
 # Local training on each client; each client train privately
 class LocalUpdate(object):
     def __init__(self, args, dataset, idxs, logger, encoder=None, head=None, client_id=None, label_mappings=None):
         self.args = args
         self.logger = logger
-        # self.device = 'cuda' if args.gpu else 'cpu'
-        # self.device = (
-        #     'cuda'
-        #     if torch.cuda.is_available() and self.args.gpu is not None
-        #     else 'cpu'
-        # )
         self.device = 'cuda' if torch.cuda.is_available() and (not self.args.cpu) else 'cpu'
         if self.device == 'cuda':
             torch.cuda.set_device(self.args.gpu)
@@ -73,26 +47,8 @@ class LocalUpdate(object):
             self.criterion = nn.CrossEntropyLoss().to(self.device)  # or CrossEntropyLoss() if output isn't log_softmax
             self.optimizer = None # Optimizer not being built here but where it is needed i.e. update_weights
 
-    def train_val_test(self, dataset,idxs ):
-        '''
-        Returns train, validation and test dataloaders for a given dataset
-        and user indexes.
-        '''
 
-        # Split indexes for train, validation and test (80,10,10)
-        idxs_train = idxs[:int(0.8*len(idxs))]
-        idxs_val = idxs[int(0.8*len(idxs)):int(0.9*len(idxs))]
-        idxs_test = idxs[int(0.9*len(idxs)):]
-
-        trainloader = DataLoader(DatasetSplit(dataset,idxs_train),
-                                 batch_size=self.args.local_bs, shuffle = True)
-
-        validloader = DataLoader(DatasetSplit(dataset,idxs_val), batch_size=int(len(idxs_val)/10), shuffle=False)
-
-        testloader = DataLoader(DatasetSplit(dataset, idxs_test), batch_size=int(len(idxs_test)/10), shuffle=False)
-
-        return trainloader, validloader, testloader
-
+# Removed def train_val_test
 
     def update_weights(self, global_round):
         self.encoder.to(self.device)
@@ -168,7 +124,16 @@ class LocalUpdate(object):
                 # outputs = self.head(self.encoder(images))
                 # With AWGN noise
                 x = self.encoder(images)
-                x_hat = awgn_channel(x, sigma=self.args.sigma)
+                power_before = x.pow(2).mean(dim=1).mean().item()
+                print(power_before)
+                if self.args.signal_normalize:
+                    x = rms_power_normalize_signal(x) # Normalization of latent vector to unit power
+                    power_after = x.pow(2).mean(dim=1).mean().item()
+                    print(power_after)
+                    x_hat=awgn_channel_normalize(x,sigma_signal=self.args.sigma_signal, snr_db_signal=self.args.snr_db_signal)
+
+                else:
+                    x_hat = awgn_channel_no_normalize(x, sigma_signal=self.args.sigma_signal, snr_db_signal=self.args.snr_db_signal)
                 if batch_idx == 0 and epoch == 0:
                     print(
                         f"[Client {self.client_id}] x std={x.std().item():.4f} | noise std={(x_hat - x).std().item():.4f}")
@@ -182,12 +147,6 @@ class LocalUpdate(object):
                 bs = labels.size(0)
                 loss_sum += loss.item() * bs
                 count += bs
-
-                # batch_loss.append(loss.item()) #  FL Loss - Storing it for "this" batch
-
-            # epoch_loss.append(sum(batch_loss) / len(batch_loss)) #  FL Loss - epoch loss is average of the batch losses in that epoch
-
-        # avg_loss = sum(epoch_loss) / len(epoch_loss) # FL Loss - Average loss over local epochs = loss for a communication round
 
         # (this is optional but we are doing it here) switch back to eval when done
         self.encoder.eval()
@@ -203,10 +162,10 @@ class LocalUpdate(object):
         else:
             return self.model.state_dict(), avg_loss
 
+    # Train Accuracy on client's local training data
     def inference(self):
         self.encoder.eval()
         self.head.eval()
-        # self.model.eval()
 
         loss_sum, count = 0.0, 0
         total, correct = 0, 0
@@ -223,7 +182,6 @@ class LocalUpdate(object):
                                           device=self.device, dtype=torch.long)
 
 
-
                 # Optional sanity check (same logic as in update_weights)
                 if hasattr(self.head, "fc"):
                     out_dim = self.head.fc[-1].out_features
@@ -237,17 +195,17 @@ class LocalUpdate(object):
                     raise ValueError(f"[Infer][Client {self.client_id}] Mapped labels out of range "
                                      f"(min={labels.min().item()}, max={labels.max().item()}, out_dim={out_dim})")
 
-                # Optional sanity check
 
-                # outputs = self.model(images)
-                # batch_loss = self.criterion(outputs, labels)
-                # loss += batch_loss.item()
-
-                # Same bound check already used in training
-
-                # outputs = self.model(images)
                 x = self.encoder(images)
-                x_hat = awgn_channel(x, sigma=self.args.sigma)
+                power_before = x.pow(2).mean(dim=1).mean().item()
+                if self.args.signal_normalize:
+                    x = rms_power_normalize_signal(x)  # Normalization of latent vector to unit power
+                    power_after = x.pow(2).mean(dim=1).mean().item()
+                    print(power_after)
+                    x_hat = awgn_channel_normalize(x, sigma_signal=self.args.sigma_signal, snr_db_signal=self.args.snr_db_signal)
+                else:
+                    x_hat = awgn_channel_no_normalize(x, sigma_signal=self.args.sigma_signal, snr_db_signal=self.args.snr_db_signal)
+
                 outputs = self.head(x_hat)
                 batch_loss = self.criterion(outputs, labels)  # mean over batch
                 loss_sum += batch_loss.item() * labels.size(0)  # accumulate by sample
@@ -339,22 +297,28 @@ def test_inference_multitask(
                         f"min={labels.min().item()}, max={labels.max().item()}"
                     )
 
-                # Without noise
-                # outputs = model(images)
-
-                # With noise
+                # With noise (toggle)
                 x = encoder(images)
-                x_hat = awgn_channel(x, sigma=args.sigma)
+                power_before = x.pow(2).mean(dim=1).mean().item()
+                if args.signal_normalize:
+                    x = rms_power_normalize_signal(x)  # Normalization of latent vector to unit power
+                    power_after = x.pow(2).mean(dim=1).mean().item()
+                    print(power_after)
+                    x_hat=awgn_channel_normalize(x, sigma_signal=args.sigma_signal, snr_db_signal=args.snr_db_signal)
+
+                else:
+                    x_hat = awgn_channel_no_normalize(x, sigma_signal=args.sigma_signal,snr_db_signal=args.snr_db_signal)
                 outputs = head(x_hat)
+                head = head.to(device)
 
                 # loss returned is mean over the batch -> convert to sum then to per-sample
                 bs = labels.size(0)
                 batch_loss = criterion(outputs, labels)   # mean over batch
-                loss_sum   += batch_loss.item() * bs
-                samples    += bs
+                loss_sum += batch_loss.item() * bs
+                samples += bs
 
                 _, predicted = torch.max(outputs, 1)
-                correct    += (predicted == labels).sum().item()
+                correct += (predicted == labels).sum().item()
 
         # per-client stats for this round
         acc_client = 100.0 * correct / samples if samples > 0 else 0.0
@@ -363,15 +327,15 @@ def test_inference_multitask(
         # stash into dicts
         if client_id not in client_test_accuracies:
             client_test_accuracies[client_id] = []
-            client_test_losses[client_id]     = []
+            client_test_losses[client_id] = []
         client_test_accuracies[client_id].append(acc_client)
         client_test_losses[client_id].append(loss_client)
 
         # accumulate overall
-        total_correct  += correct
+        total_correct += correct
         total_loss_sum += loss_sum
-        total_samples  += samples
+        total_samples += samples
 
-    avg_acc  = 100.0 * total_correct / total_samples if total_samples > 0 else 0.0
+    avg_acc = 100.0 * total_correct / total_samples if total_samples > 0 else 0.0
     avg_loss = total_loss_sum / total_samples if total_samples > 0 else 0.0
     return avg_acc, avg_loss, client_test_accuracies, client_test_losses
